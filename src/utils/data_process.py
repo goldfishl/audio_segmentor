@@ -1,4 +1,5 @@
 from .config import acup_config, gener_config
+import random
 import os
 
 
@@ -109,3 +110,45 @@ def generate_missing_word_file(prescription, acup_data):
     # Write the list of missing words to a file
     with open(gener_config['miss_file'], "w") as out_file:
         out_file.write("\n".join(missing_words + [""]))
+
+
+
+def split_dataset(config):
+    """
+    Splits the dataset of .wav files into training, validation, and testing sets, and writes the file lists to disk.
+
+    Args:
+        config (dict): A dictionary containing the configuration parameters for the dataset split, including the data path, split rates, and file names.
+
+    Returns:
+        None
+    """
+    # Get a list of all .wav files in the data directory
+    wav_files = [f for f in os.listdir(config['data_path']) if f.endswith('.wav')]
+
+    # Shuffle the list of file indices
+    num_files = len(wav_files)
+    file_indices = list(range(num_files))
+    random.shuffle(file_indices)
+
+    # Calculate the number of files for each split
+    train_len = round(num_files * config['split_rate'][0])
+    val_len = round(num_files * config['split_rate'][1])
+
+    # Split the file indices into the three sets
+    train_indices = file_indices[:train_len]
+    val_indices = file_indices[train_len:train_len+val_len]
+    test_indices = file_indices[train_len+val_len:]
+
+    # Write the file lists to disk
+    split_files = [config['split_files']['train'], 
+                   config['split_files']['valid'], config['split_files']['test']]
+    split_indices = [train_indices, val_indices, test_indices]
+    for split_file, indices in zip(split_files, split_indices):
+        # Create the file list for the current split
+        file_list = sorted([wav_files[i] for i in indices])
+
+        # Write the file list to disk
+        with open(split_file, 'w') as f:
+            for file_name in file_list:
+                f.write(f'{file_name}\n')
