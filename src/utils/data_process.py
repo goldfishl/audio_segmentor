@@ -154,18 +154,15 @@ def split_dataset(config):
                 f.write(f'{file_name}\n')
 
 
-import os
-
-def load_split(data_config):
+def load_split(data_config: dict) -> list:
     """
     Load a dataset split file that contains a list of audio file names and their corresponding labels.
 
     Args:
-        data_path (str): Path to the directory containing the audio files and their labels.
-        split_file (str): Path to the file containing the list of audio file names.
+        data_config (dict): A dictionary containing the data configuration information, including the path to the directory containing the audio files and their labels, and the path to the file containing the list of audio file names.
 
     Returns:
-        A tuple containing two lists: the list of audio file names and the list of their corresponding labels.
+        A list of tuples, where each tuple contains an audio file name and its corresponding label.
     """
     wav_files = []  # list to store audio file names
     labels = []  # list to store audio labels
@@ -182,4 +179,5 @@ def load_split(data_config):
                 label = label_file.read().strip()
                 labels.append(label)
 
+    # zip the audio file names and their labels into tuples and return as a list
     return list(zip(wav_files, labels))
