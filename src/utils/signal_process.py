@@ -1,6 +1,9 @@
 import torchaudio
 import torch
 from .config import signal_config
+import scipy.stats as stats
+import numpy as np
+
 
 def wav2fbank(num_mel_bins):
     """
@@ -80,3 +83,29 @@ def wav2fbank(num_mel_bins):
         return kaldi_fbank
     elif signal_config['compliance'] == 'torchaudio':
         return torchaudio_fbank
+
+
+def generate_gap_audio(ms):
+    """
+    Generates a gap audio signal.
+
+    Args:
+        ms (int): The length of the gap in milliseconds.
+
+    Returns:
+        numpy.ndarray: A NumPy array containing the generated audio data.
+    """
+    # Set the maximum amplitude for the audio signal
+    max_amp = 0.01  # This value should be specified in the signal_config dictionary
+
+    fs = signal_config["sample_rate"]
+
+    # Generate a truncated normal distribution with a mean of 0 and standard deviation of 1
+    # This distribution is truncated to be between -1 and 1
+    # The scale parameter is set to the minimum of 2**16 and 2**max_amp
+    # This ensures that the audio data will fit within the range of a 16-bit integer
+    noise = stats.truncnorm(-1, 1, scale=min(2**16, 2**max_amp)).rvs(ms * fs // 1000)
+
+    # Convert the audio data to a 16-bit integer and return it
+    noise = noise.astype(np.int16)
+    return noise
