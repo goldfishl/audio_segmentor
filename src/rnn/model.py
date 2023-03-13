@@ -6,7 +6,7 @@ from torch import nn
 
 
 class RNN(nn.Module):
-    def __init__(self, emb_dim=128, enc_hid_dim=256, out_dim=3, dropout=0.2):
+    def __init__(self, emb_dim=128, enc_hid_dim=256, out_dim=2, dropout=0.2):
         super().__init__()
         
         self.rnn = nn.GRU(input_size = emb_dim, 
@@ -23,9 +23,9 @@ class RNN(nn.Module):
                   )
         self.dropout = nn.Dropout(dropout)
         
-    def forward(self, embed, seq_len=[], batch_infer=False):
+    def forward(self, embed, seq_len):
         embed = self.dropout(embed)
-        if batch_infer:
+        if seq_len is not None:
             packed_embed = pack_padded_sequence(embed, seq_len.to('cpu'), batch_first=True, enforce_sorted=False)
             packed_outputs, hidden = self.rnn(packed_embed)
             outputs, _ = pad_packed_sequence(packed_outputs, batch_first=True)

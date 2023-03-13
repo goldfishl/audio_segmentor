@@ -6,7 +6,7 @@ import numpy as np
 import torchaudio
 import torch
 
-from src.utils import generate_gap_audio
+from .signal_process import generate_gap_audio
 from .config import gener_config, signal_config, acup_config
 from .data_process import get_acupoint_data, get_pres_formual, generate_missing_word_file
 
@@ -144,7 +144,7 @@ def calculate_num_frames(audio_length):
     frame_shift = int(signal_config["sample_rate"] * signal_config["frame_shift"] / 1000)
 
     # Calculate number of frames
-    num_frames = (audio_length - frame_length) // frame_shift
+    num_frames = (audio_length - frame_length + frame_shift) // frame_shift
 
     # Return the number of frames
     return num_frames
