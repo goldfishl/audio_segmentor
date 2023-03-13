@@ -1,5 +1,5 @@
 # acupoint dataset
-[download](https://www.goldfishl.me/downloads/acupoint.tar)
+
 
 # generate data
 
